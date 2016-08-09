@@ -1,5 +1,6 @@
 //  Sources: http://mongoosejs.com/docs/2.7.x/docs/finding-documents.html
 //  http://stackoverflow.com/questions/14199529/mongoose-find-modify-save
+//  Source for sorting: http://stackoverflow.com/questions/5825520/in-mongoose-how-do-i-sort-by-date-node-js
 
 import Post from '../models/post_model';
 
@@ -29,7 +30,7 @@ export const createPost = (req, res) => {
 };
 
 export const getPosts = (req, res) => {
-  Post.find()
+  Post.find().sort({ createdAt: -1 })
     .then(posts => {
       res.json(cleanAllPosts(posts));
     })
@@ -52,7 +53,7 @@ export const getPost = (req, res) => {
 export const deletePost = (req, res) => {
   Post.remove({ _id: req.params.id })
     .then(() => {
-      res.json('Post successfully deleted!');
+      res.json({ message: 'Post successfully deleted!' });
     })
     .catch(error => {
       res.json({ error });
@@ -60,12 +61,12 @@ export const deletePost = (req, res) => {
 };
 
 export const updatePost = (req, res) => {
-  Post.update({ _id: req.params.id }, {
+  Post.findOneAndUpdate({ _id: req.params.id }, {
     title: req.body.title,
     tags: req.body.tags,
     content: req.body.content,
   }).then(() => {
-    res.send('Successfully updated post!');
+    res.send({ message: 'Successfully updated post!' });
   })
   .catch(error => {
     res.json({ error });

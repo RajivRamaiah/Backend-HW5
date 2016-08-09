@@ -17,5 +17,4 @@ router.route('/posts/')
   .post(Posts.createPost)
   .get(Posts.getPosts);
 
-
 export default router;
