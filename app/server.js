@@ -20,7 +20,7 @@ app.use('/api', apiRouter);
 
 // default index route
 app.get('/', (req, res) => {
-  res.send('hi');
+  res.send('Hello World!');
 });
 
 // START THE SERVER
