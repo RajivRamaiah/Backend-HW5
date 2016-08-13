@@ -7,6 +7,7 @@ import bcrypt from 'bcrypt-nodejs';
 const UserSchema = new Schema({
   email: { type: String, unique: true, lowercase: true },
   password: String,
+  username: { type: String, unique: true },
 });
 
 UserSchema.set('toJSON', {
@@ -19,15 +20,21 @@ UserSchema.pre('save', function beforeyYourModelSave(next) { // eslint-disable-l
   const user = this;
 
   // only hash the password if it has been modified (or is new)
-  if (!user.isModified('password')) return next();
+  if (!user.isModified('password')) {
+    return next();
+  }
 
   // generate a salt then run callback
   bcrypt.genSalt(10, (err, salt) => { // eslint-disable-line consistent-return
-    if (err) { return next(err); }
+    if (err) {
+      return next(err);
+    }
 
     // hash (encrypt) our password using the salt
     bcrypt.hash(user.password, salt, null, (err, hash) => {
-      if (err) { return next(err); }
+      if (err) {
+        return next(err);
+      }
 
       // overwrite plain text password with encrypted password
       user.password = hash;
@@ -42,7 +49,9 @@ UserSchema.pre('save', function beforeyYourModelSave(next) { // eslint-disable-l
 //  this arrow notation is lexically scoped and prevents binding scope, which mongoose relies on
 UserSchema.methods.comparePassword = function comparePassword(candidatePassword, callback) {
   bcrypt.compare(candidatePassword, this.password, (err, isMatch) => { // eslint-disable-line consistent-return
-    if (err) { return callback(err); }
+    if (err) {
+      return callback(err);
+    }
 
     callback(null, isMatch);
   });

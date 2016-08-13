@@ -2,7 +2,9 @@
 
 import User from '../models/user_model';
 import jwt from 'jwt-simple';
-import config from '../config';
+// import config from '../config';
+import dotenv from 'dotenv';
+dotenv.config({ silent: true });
 
 
 export const signin = (req, res, next) => {
@@ -10,12 +12,20 @@ export const signin = (req, res, next) => {
   res.send({ token: tokenForUser(req.user) });
 };
 
+// encodes a new token for a user object
+function tokenForUser(user) {
+  const timestamp = new Date().getTime();
+  return jwt.encode({ sub: user.id, iat: timestamp }, process.env.API_SECRET);
+}
+
 export const signup = (req, res, next) => { // eslint-disable-line consistent-return
+  console.log('sign up started');
   const email = req.body.email;
   const password = req.body.password;
+  const username = req.body.username;
 
-  if (!email || !password) {
-    return res.status(422).send('You must provide an email and password to sign up!');
+  if (!email || !password || !username) {
+    return res.status(422).send('You must provide an email, a password, and a username to sign up!');
   }
 
   // here you should do a mongo query to find if a user already exists with this email.
@@ -28,17 +38,19 @@ export const signup = (req, res, next) => { // eslint-disable-line consistent-re
     .then((user) => { // eslint-disable-line consistent-return
       if (user) {
         return res.status(422).send('The password or email you entered has been taken!');
-      } else {
+      }
+      else { // eslint-disable-line brace-style
         const newUser = new User();
         newUser.email = email;
         newUser.password = password;
+        newUser.username = username;
         newUser.save()
-        .then(() => {
-          res.send({ token: tokenForUser(user) });
-        })
-        .catch(err => {
-          res.status(400).send(`${err}`);
-        });
+          .then(() => {
+            res.send({ token: tokenForUser(user) });
+          })
+          .catch(err => {
+            res.status(400).send(`${err}`);
+          });
       }
     }
   )
@@ -46,9 +58,3 @@ export const signup = (req, res, next) => { // eslint-disable-line consistent-re
     res.status(400).send(`${err}`);
   });
 };
-
-// encodes a new token for a user object
-function tokenForUser(user) {
-  const timestamp = new Date().getTime();
-  return jwt.encode({ sub: user.id, iat: timestamp }, config.secret);
-}
