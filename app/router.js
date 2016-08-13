@@ -5,6 +5,7 @@ import { requireAuth, requireSignin } from './services/passport';
 
 const router = Router();
 
+
 router.get('/', (req, res) => {
   res.json({ message: 'welcome to our blog api!' });
 });
