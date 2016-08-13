@@ -11,12 +11,11 @@ export const signin = (req, res, next) => {
 };
 
 export const signup = (req, res, next) => { // eslint-disable-line consistent-return
-  const username = req.body.username;
   const email = req.body.email;
   const password = req.body.password;
 
-  if (!email || !password || !username) {
-    return res.status(422).send('You must provide an email, password, and username to sign up!');
+  if (!email || !password) {
+    return res.status(422).send('You must provide an email and password to sign up!');
   }
 
   // here you should do a mongo query to find if a user already exists with this email.
@@ -28,10 +27,9 @@ export const signup = (req, res, next) => { // eslint-disable-line consistent-re
   User.findOne({ email })
     .then((user) => { // eslint-disable-line consistent-return
       if (user) {
-        return res.status(422).send('The password, email, or username you entered has been taken!');
+        return res.status(422).send('The password or email you entered has been taken!');
       } else {
         const newUser = new User();
-        newUser.username = username;
         newUser.email = email;
         newUser.password = password;
         newUser.save()
