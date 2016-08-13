@@ -1,3 +1,5 @@
+//  Sources: http://stackoverflow.com/questions/27732209/turning-off-eslint-rule-for-a-specific-line
+
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt-nodejs';
 
