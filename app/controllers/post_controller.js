@@ -10,9 +10,9 @@ const cleanAllPosts = (posts) => {
   });
 };
 
-const cleanOnePost = (post) => {
-  return { id: post._id, title: post.title, tags: post.tags, content: post.content };
-};
+// const cleanOnePost = (post) => {
+//   return { id: post._id, title: post.title, tags: post.tags, content: post.content };
+// };
 
 export const createPost = (req, res) => {
   // res.send('post should be created here');
