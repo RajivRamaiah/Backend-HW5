@@ -37,7 +37,7 @@ export const signup = (req, res, next) => { // eslint-disable-line consistent-re
   User.findOne({ email })
     .then((user) => { // eslint-disable-line consistent-return
       if (user) {
-        return res.status(422).send('The password or email you entered has been taken!');
+        return res.status(422).send('The password or email or username you entered has been taken!');
       }
       else { // eslint-disable-line brace-style
         const newUser = new User();
@@ -45,8 +45,8 @@ export const signup = (req, res, next) => { // eslint-disable-line consistent-re
         newUser.password = password;
         newUser.username = username;
         newUser.save()
-          .then(() => {
-            res.send({ token: tokenForUser(user) });
+          .then((result) => {
+            res.send({ token: tokenForUser(result) });
           })
           .catch(err => {
             res.status(400).send(`${err}`);
