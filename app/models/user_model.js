@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt-nodejs';
 
 // create a schema for posts with a field
 const UserSchema = new Schema({
+  username: { type: String, unique: true },
   email: { type: String, unique: true, lowercase: true },
   password: String,
 });
@@ -11,14 +12,16 @@ UserSchema.set('toJSON', {
   virtuals: true,
 });
 
-UserSchema.pre('save', function beforeyYourModelSave(next) {
-
+UserSchema.pre('save', function beforeyYourModelSave(next) { // eslint-disable-line consistent-return
   // this is a reference to our model
   // the function runs in some other context so DO NOT bind it
-  const model = this;
+  const user = this;
+
+  // only hash the password if it has been modified (or is new)
+  if (!user.isModified('password')) return next();
 
   // generate a salt then run callback
-  bcrypt.genSalt(10, (err, salt) => {
+  bcrypt.genSalt(10, (err, salt) => { // eslint-disable-line consistent-return
     if (err) { return next(err); }
 
     // hash (encrypt) our password using the salt
@@ -32,9 +35,17 @@ UserSchema.pre('save', function beforeyYourModelSave(next) {
   });
   // when done run the next callback with no arguments
   // call next with an error if you encounter one
-  // return next();
+});
 
-)};
+// note use of named function rather than arrow notation
+//  this arrow notation is lexically scoped and prevents binding scope, which mongoose relies on
+UserSchema.methods.comparePassword = function comparePassword(candidatePassword, callback) {
+  bcrypt.compare(candidatePassword, this.password, (err, isMatch) => { // eslint-disable-line consistent-return
+    if (err) { return callback(err); }
+
+    callback(null, isMatch);
+  });
+};
 
 // create model class
 const UserModel = mongoose.model('User', UserSchema);
